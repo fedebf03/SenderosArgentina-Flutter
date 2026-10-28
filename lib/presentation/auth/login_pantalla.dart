@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/repository/autenticacion_repositorio.dart';
-import '../inicio/inicio_pantalla.dart';
 import 'registro_pantalla.dart';
 
 class LoginPantalla extends StatefulWidget {
@@ -49,11 +48,6 @@ class _LoginPantallaState extends State<LoginPantalla> {
     });
     try {
       await inicioDeSesion();
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const InicioPantalla()),
-      );
     } on ErrorAutenticacion catch (e) {
       setState(() {
         _cargando = false;

@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'data/repository/autenticacion_repositorio_firebase.dart';
+import 'domain/model/usuario.dart';
 import 'presentation/auth/login_pantalla.dart';
+import 'presentation/inicio/inicio_pantalla.dart';
 import 'presentation/tema.dart';
 
 Future<void> main() async {
@@ -17,11 +19,19 @@ class SenderosApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final autenticacion = AutenticacionRepositorioFirebase();
     return MaterialApp(
       title: 'Senderos Argentina',
       debugShowCheckedModeBanner: false,
       theme: temaSenderos,
-      home: LoginPantalla(repositorio: AutenticacionRepositorioFirebase()),
+      // Al iniciar o cerrar sesión la pantalla principal cambia sola, sin navegar a mano
+      home: StreamBuilder<Usuario?>(
+        stream: autenticacion.cambiosDeSesion(),
+        initialData: autenticacion.usuarioActual(),
+        builder: (context, sesion) => sesion.data != null
+            ? const InicioPantalla()
+            : LoginPantalla(repositorio: autenticacion),
+      ),
     );
   }
 }

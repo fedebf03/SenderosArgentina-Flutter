@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/repository/autenticacion_repositorio.dart';
-import '../inicio/inicio_pantalla.dart';
 
 class RegistroPantalla extends StatefulWidget {
   final AutenticacionRepositorio repositorio;
@@ -52,11 +51,7 @@ class _RegistroPantallaState extends State<RegistroPantalla> {
     try {
       await widget.repositorio.registrar(correo, clave);
       if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const InicioPantalla()),
-        (_) => false,
-      );
+      Navigator.pop(context);
     } on ErrorAutenticacion catch (e) {
       setState(() {
         _cargando = false;

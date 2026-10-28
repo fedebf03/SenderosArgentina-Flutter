@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../domain/model/usuario.dart';
 import '../../domain/repository/autenticacion_repositorio.dart';
 
 class AutenticacionRepositorioFirebase implements AutenticacionRepositorio {
@@ -59,6 +60,22 @@ class AutenticacionRepositorioFirebase implements AutenticacionRepositorio {
     } catch (_) {
       throw ErrorAutenticacion('No se pudo crear la cuenta');
     }
+  }
+
+  @override
+  Usuario? usuarioActual() => _aUsuario(_auth.currentUser);
+
+  // RF1 - Sesión: Firebase guarda el usuario en el dispositivo y avisa cada vez que se entra o se sale
+  @override
+  Stream<Usuario?> cambiosDeSesion() => _auth.authStateChanges().map(_aUsuario);
+
+  Usuario? _aUsuario(User? usuario) {
+    if (usuario == null) return null;
+    return Usuario(
+      correo: usuario.email ?? '',
+      nombre: usuario.displayName ?? '',
+      fotoUrl: usuario.photoURL ?? '',
+    );
   }
 
   String _mensajeDeError(
