@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'data/repository/autenticacion_repositorio_firebase.dart';
 import 'presentation/pantallas/login_pantalla.dart';
+import 'presentation/tema.dart';
 
 Future<void> main() async {
   // Firebase tiene que estar listo antes de dibujar la primera pantalla
@@ -19,7 +20,7 @@ class SenderosApp extends StatelessWidget {
     return MaterialApp(
       title: 'Senderos Argentina',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: Colors.green),
+      theme: temaSenderos,
       home: LoginPantalla(repositorio: AutenticacionRepositorioFirebase()),
     );
   }

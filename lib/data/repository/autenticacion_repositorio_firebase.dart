@@ -12,6 +12,8 @@ class AutenticacionRepositorioFirebase implements AutenticacionRepositorio {
       await _auth.signInWithEmailAndPassword(email: correo, password: clave);
     } on FirebaseAuthException catch (e) {
       throw ErrorAutenticacion(_mensajeDeError(e.code));
+    } catch (_) {
+      throw ErrorAutenticacion('No se pudo iniciar sesión');
     }
   }
 
