@@ -38,13 +38,16 @@ class _LoginPantallaState extends State<LoginPantalla> {
       setState(() => _error = 'El correo no tiene un formato válido');
       return;
     }
+    await _entrar(() => widget.repositorio.iniciarSesion(correo, clave));
+  }
 
+  Future<void> _entrar(Future<void> Function() inicioDeSesion) async {
     setState(() {
       _cargando = true;
       _error = null;
     });
     try {
-      await widget.repositorio.iniciarSesion(correo, clave);
+      await inicioDeSesion();
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -125,6 +128,14 @@ class _LoginPantallaState extends State<LoginPantalla> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Text('Iniciar sesión'),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  onPressed: _cargando
+                      ? null
+                      : () =>
+                            _entrar(widget.repositorio.iniciarSesionConGoogle),
+                  child: const Text('Continuar con Google'),
                 ),
               ],
             ),

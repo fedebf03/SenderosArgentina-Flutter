@@ -6,4 +6,6 @@ class ErrorAutenticacion implements Exception {
 
 abstract class AutenticacionRepositorio {
   Future<void> iniciarSesion(String correo, String clave);
+
+  Future<void> iniciarSesionConGoogle();
 }
