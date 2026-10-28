@@ -34,6 +34,10 @@ class _LoginPantallaState extends State<LoginPantalla> {
       setState(() => _error = 'Completá el correo y la contraseña');
       return;
     }
+    if (!correo.contains('@') || !correo.contains('.')) {
+      setState(() => _error = 'El correo no tiene un formato válido');
+      return;
+    }
 
     setState(() {
       _cargando = true;
