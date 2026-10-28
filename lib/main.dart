@@ -29,7 +29,7 @@ class SenderosApp extends StatelessWidget {
         stream: autenticacion.cambiosDeSesion(),
         initialData: autenticacion.usuarioActual(),
         builder: (context, sesion) => sesion.data != null
-            ? const InicioPantalla()
+            ? InicioPantalla(autenticacion: autenticacion)
             : LoginPantalla(repositorio: autenticacion),
       ),
     );

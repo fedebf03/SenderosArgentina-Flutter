@@ -16,4 +16,6 @@ abstract class AutenticacionRepositorio {
   Usuario? usuarioActual();
 
   Stream<Usuario?> cambiosDeSesion();
+
+  Future<void> cerrarSesion();
 }

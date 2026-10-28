@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/repository/autenticacion_repositorio.dart';
 import '../explorar/explorar_pantalla.dart';
 import '../perfil/perfil_pantalla.dart';
 
 class InicioPantalla extends StatefulWidget {
-  const InicioPantalla({super.key});
+  final AutenticacionRepositorio autenticacion;
+
+  const InicioPantalla({super.key, required this.autenticacion});
 
   @override
   State<InicioPantalla> createState() => _InicioPantallaState();
@@ -25,7 +28,9 @@ class _InicioPantallaState extends State<InicioPantalla> {
           ],
         ),
       ),
-      body: _seccion == 0 ? const ExplorarPantalla() : const PerfilPantalla(),
+      body: _seccion == 0
+          ? const ExplorarPantalla()
+          : PerfilPantalla(autenticacion: widget.autenticacion),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _seccion,
         onDestinationSelected: (indice) => setState(() => _seccion = indice),

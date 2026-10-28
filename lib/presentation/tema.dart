@@ -12,6 +12,7 @@ final ThemeData temaSenderos = ThemeData(
     tertiary: Color(0xFFB86E00),
     surface: Colors.white,
     onSurface: Color(0xFF14213D),
+    onSurfaceVariant: Color(0xFF4A5A70),
     outline: Color(0xFF74808F),
     error: Color(0xFFBA1A1A),
   ),

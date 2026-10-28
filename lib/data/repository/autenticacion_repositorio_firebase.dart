@@ -78,6 +78,14 @@ class AutenticacionRepositorioFirebase implements AutenticacionRepositorio {
     );
   }
 
+  // RF1 - Sesión: se cierra también la de Google. Si no, el popup vuelve a entrar con la misma cuenta
+  @override
+  Future<void> cerrarSesion() async {
+    await _auth.signOut();
+    await _googleListo;
+    await GoogleSignIn.instance.signOut();
+  }
+
   String _mensajeDeError(
     String codigo, {
     String porDefecto = 'No se pudo iniciar sesión',
