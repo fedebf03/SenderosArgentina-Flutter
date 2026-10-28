@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/repository/autenticacion_repositorio.dart';
-import 'inicio_pantalla.dart';
+import '../inicio/inicio_pantalla.dart';
 
 class LoginPantalla extends StatefulWidget {
   final AutenticacionRepositorio repositorio;

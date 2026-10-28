@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'data/repository/autenticacion_repositorio_firebase.dart';
-import 'presentation/pantallas/login_pantalla.dart';
+import 'presentation/auth/login_pantalla.dart';
 import 'presentation/tema.dart';
 
 Future<void> main() async {
