@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'data/repository/autenticacion_repositorio_firebase.dart';
+import 'presentation/pantallas/login_pantalla.dart';
+
 Future<void> main() async {
   // Firebase tiene que estar listo antes de dibujar la primera pantalla
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +20,7 @@ class SenderosApp extends StatelessWidget {
       title: 'Senderos Argentina',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorSchemeSeed: Colors.green),
-      home: Scaffold(appBar: AppBar(title: const Text('Senderos Argentina'))),
+      home: LoginPantalla(repositorio: AutenticacionRepositorioFirebase()),
     );
   }
 }
