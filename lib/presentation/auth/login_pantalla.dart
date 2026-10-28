@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../domain/repository/autenticacion_repositorio.dart';
 import '../inicio/inicio_pantalla.dart';
+import 'registro_pantalla.dart';
 
 class LoginPantalla extends StatefulWidget {
   final AutenticacionRepositorio repositorio;
@@ -137,6 +138,23 @@ class _LoginPantallaState extends State<LoginPantalla> {
                             _entrar(widget.repositorio.iniciarSesionConGoogle),
                   icon: Image.asset('assets/logo_google.png', height: 20),
                   label: const Text('Continuar con Google'),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('¿No tenés cuenta?'),
+                    TextButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              RegistroPantalla(repositorio: widget.repositorio),
+                        ),
+                      ),
+                      child: const Text('Registrate'),
+                    ),
+                  ],
                 ),
               ],
             ),

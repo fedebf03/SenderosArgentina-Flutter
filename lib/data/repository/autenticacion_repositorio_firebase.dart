@@ -44,8 +44,32 @@ class AutenticacionRepositorioFirebase implements AutenticacionRepositorio {
     }
   }
 
-  String _mensajeDeError(String codigo) {
+  // RF1 - Registro: Firebase crea la cuenta y deja la sesión iniciada
+  @override
+  Future<void> registrar(String correo, String clave) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: correo,
+        password: clave,
+      );
+    } on FirebaseAuthException catch (e) {
+      throw ErrorAutenticacion(
+        _mensajeDeError(e.code, porDefecto: 'No se pudo crear la cuenta'),
+      );
+    } catch (_) {
+      throw ErrorAutenticacion('No se pudo crear la cuenta');
+    }
+  }
+
+  String _mensajeDeError(
+    String codigo, {
+    String porDefecto = 'No se pudo iniciar sesión',
+  }) {
     switch (codigo) {
+      case 'email-already-in-use':
+        return 'Ya existe una cuenta con ese correo';
+      case 'weak-password':
+        return 'La contraseña es muy débil';
       case 'invalid-email':
         return 'El correo no tiene un formato válido';
       case 'invalid-credential':
@@ -55,7 +79,7 @@ class AutenticacionRepositorioFirebase implements AutenticacionRepositorio {
       case 'network-request-failed':
         return 'Sin conexión a internet';
       default:
-        return 'No se pudo iniciar sesión';
+        return porDefecto;
     }
   }
 }

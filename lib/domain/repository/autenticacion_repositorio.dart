@@ -8,4 +8,6 @@ abstract class AutenticacionRepositorio {
   Future<void> iniciarSesion(String correo, String clave);
 
   Future<void> iniciarSesionConGoogle();
+
+  Future<void> registrar(String correo, String clave);
 }
