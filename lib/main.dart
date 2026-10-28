@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'data/repository/autenticacion_repositorio_firebase.dart';
+import 'data/repository/perfil_repositorio_firestore.dart';
 import 'domain/model/usuario.dart';
 import 'presentation/auth/login_pantalla.dart';
 import 'presentation/inicio/inicio_pantalla.dart';
@@ -20,6 +21,7 @@ class SenderosApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final autenticacion = AutenticacionRepositorioFirebase();
+    final perfiles = PerfilRepositorioFirestore();
     return MaterialApp(
       title: 'Senderos Argentina',
       debugShowCheckedModeBanner: false,
@@ -29,7 +31,7 @@ class SenderosApp extends StatelessWidget {
         stream: autenticacion.cambiosDeSesion(),
         initialData: autenticacion.usuarioActual(),
         builder: (context, sesion) => sesion.data != null
-            ? InicioPantalla(autenticacion: autenticacion)
+            ? InicioPantalla(autenticacion: autenticacion, perfiles: perfiles)
             : LoginPantalla(repositorio: autenticacion),
       ),
     );
