@@ -7,6 +7,12 @@ class Sendero {
   final double distanciaKilometros;
   final Dificultad dificultad;
   final String descripcion;
+  final String autor;
+  final String foto;
+  final int desnivelMetros;
+  final String duracionEstimada;
+  final String puntoInicio;
+  final String mejorEpoca;
 
   Sendero({
     required this.id,
@@ -15,5 +21,11 @@ class Sendero {
     required this.distanciaKilometros,
     required this.dificultad,
     this.descripcion = '',
+    this.autor = '',
+    this.foto = '',
+    this.desnivelMetros = 0,
+    this.duracionEstimada = '',
+    this.puntoInicio = '',
+    this.mejorEpoca = '',
   });
 }

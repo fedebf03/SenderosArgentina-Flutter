@@ -14,6 +14,7 @@ final ThemeData temaSenderos = ThemeData(
     onSurface: Color(0xFF14213D),
     onSurfaceVariant: Color(0xFF4A5A70),
     outline: Color(0xFF74808F),
+    outlineVariant: Color(0xFFD3DEE9),
     error: Color(0xFFBA1A1A),
   ),
   scaffoldBackgroundColor: const Color(0xFFF2F6FA),

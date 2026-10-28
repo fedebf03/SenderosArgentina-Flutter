@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../domain/repository/autenticacion_repositorio.dart';
 import '../../domain/repository/perfil_repositorio.dart';
+import '../../domain/repository/sendero_repositorio.dart';
 import '../explorar/explorar_pantalla.dart';
 import '../perfil/perfil_pantalla.dart';
 
 class InicioPantalla extends StatefulWidget {
   final AutenticacionRepositorio autenticacion;
   final PerfilRepositorio perfiles;
+  final SenderoRepositorio senderos;
 
   const InicioPantalla({
     super.key,
     required this.autenticacion,
     required this.perfiles,
+    required this.senderos,
   });
 
   @override
@@ -35,7 +38,7 @@ class _InicioPantallaState extends State<InicioPantalla> {
         ),
       ),
       body: _seccion == 0
-          ? const ExplorarPantalla()
+          ? ExplorarPantalla(senderos: widget.senderos)
           : PerfilPantalla(
               autenticacion: widget.autenticacion,
               perfiles: widget.perfiles,
