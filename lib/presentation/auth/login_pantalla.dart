@@ -130,12 +130,13 @@ class _LoginPantallaState extends State<LoginPantalla> {
                       : const Text('Iniciar sesión'),
                 ),
                 const SizedBox(height: 12),
-                OutlinedButton(
+                OutlinedButton.icon(
                   onPressed: _cargando
                       ? null
                       : () =>
                             _entrar(widget.repositorio.iniciarSesionConGoogle),
-                  child: const Text('Continuar con Google'),
+                  icon: Image.asset('assets/logo_google.png', height: 20),
+                  label: const Text('Continuar con Google'),
                 ),
               ],
             ),
