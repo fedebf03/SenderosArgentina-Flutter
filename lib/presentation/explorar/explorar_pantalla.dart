@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/model/sendero.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import 'datos_sendero.dart';
+import 'detalle_sendero_pantalla.dart';
 
 class ExplorarPantalla extends StatefulWidget {
   final SenderoRepositorio senderos;
@@ -61,42 +62,50 @@ class _TarjetaSendero extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          _Foto(url: sendero.foto),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    sendero.nombre,
-                    style: tema.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(sendero.region, style: gris),
-                  if (sendero.autor.isNotEmpty)
-                    Text('Por ${sendero.autor}', style: gris),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        kilometros(sendero.distanciaKilometros),
-                        style: gris,
+      child: InkWell(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DetalleSenderoPantalla(sendero: sendero),
+          ),
+        ),
+        child: Row(
+          children: [
+            _Foto(url: sendero.foto),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      sendero.nombre,
+                      style: tema.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                      if (sendero.duracionEstimada.isNotEmpty)
-                        Text(' · ${sendero.duracionEstimada}', style: gris),
-                      const Spacer(),
-                      IndicadorDificultad(dificultad: sendero.dificultad),
-                    ],
-                  ),
-                ],
+                    ),
+                    Text(sendero.region, style: gris),
+                    if (sendero.autor.isNotEmpty)
+                      Text('Por ${sendero.autor}', style: gris),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text(
+                          kilometros(sendero.distanciaKilometros),
+                          style: gris,
+                        ),
+                        if (sendero.duracionEstimada.isNotEmpty)
+                          Text(' · ${sendero.duracionEstimada}', style: gris),
+                        const Spacer(),
+                        IndicadorDificultad(dificultad: sendero.dificultad),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
