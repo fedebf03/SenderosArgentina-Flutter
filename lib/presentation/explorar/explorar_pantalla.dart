@@ -17,33 +17,84 @@ class ExplorarPantalla extends StatefulWidget {
 class _ExplorarPantallaState extends State<ExplorarPantalla> {
   late final Future<List<Sendero>> _senderos = widget.senderos
       .obtenerSenderos();
+  final _buscador = TextEditingController();
+
+  @override
+  void dispose() {
+    _buscador.dispose();
+    super.dispose();
+  }
+
+  // RF2 - Explorar: la búsqueda filtra por nombre o región sin distinguir mayúsculas
+  List<Sendero> _filtrar(List<Sendero> senderos) {
+    final texto = _buscador.text.trim().toLowerCase();
+    return senderos
+        .where(
+          (sendero) =>
+              sendero.nombre.toLowerCase().contains(texto) ||
+              sendero.region.toLowerCase().contains(texto),
+        )
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Sendero>>(
-      future: _senderos,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Center(
-            child: Text('No pudimos cargar los senderos públicos'),
-          );
-        }
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final senderos = snapshot.data!;
-        if (senderos.isEmpty) {
-          return const Center(
-            child: Text('Todavía no hay senderos publicados'),
-          );
-        }
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: senderos.length,
-          itemBuilder: (context, indice) =>
-              _TarjetaSendero(sendero: senderos[indice]),
-        );
-      },
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: TextField(
+            controller: _buscador,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: 'Buscar senderos',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _buscador.text.isEmpty
+                  ? null
+                  : IconButton(
+                      tooltip: 'Borrar búsqueda',
+                      icon: const Icon(Icons.close),
+                      onPressed: () => setState(_buscador.clear),
+                    ),
+              filled: true,
+              fillColor: Theme.of(context).colorScheme.surface,
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(28)),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: FutureBuilder<List<Sendero>>(
+            future: _senderos,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Center(
+                  child: Text('No pudimos cargar los senderos públicos'),
+                );
+              }
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Text('Todavía no hay senderos publicados'),
+                );
+              }
+              final senderos = _filtrar(snapshot.data!);
+              if (senderos.isEmpty) {
+                return const Center(child: Text('No se encontraron senderos'));
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: senderos.length,
+                itemBuilder: (context, indice) =>
+                    _TarjetaSendero(sendero: senderos[indice]),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
