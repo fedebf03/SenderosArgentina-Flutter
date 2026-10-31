@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/model/sendero.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
 import '../explorar/explorar_pantalla.dart';
@@ -9,11 +10,13 @@ import 'formulario_sendero_pantalla.dart';
 class MisSenderosPantalla extends StatelessWidget {
   final SenderoRepositorio senderos;
   final UbicacionRepositorio ubicacion;
+  final NotificacionRepositorio notificaciones;
 
   const MisSenderosPantalla({
     super.key,
     required this.senderos,
     required this.ubicacion,
+    required this.notificaciones,
   });
 
   @override
@@ -27,6 +30,7 @@ class MisSenderosPantalla extends StatelessWidget {
             builder: (_) => FormularioSenderoPantalla(
               senderos: senderos,
               ubicacion: ubicacion,
+              notificaciones: notificaciones,
             ),
           ),
         ),
@@ -57,6 +61,7 @@ class MisSenderosPantalla extends StatelessWidget {
             sendero: lista[indice],
             senderos: senderos,
             ubicacion: ubicacion,
+            notificaciones: notificaciones,
           ),
         );
       },

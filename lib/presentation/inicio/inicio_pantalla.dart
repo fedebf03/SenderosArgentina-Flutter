@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/repository/autenticacion_repositorio.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/perfil_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
@@ -13,6 +14,7 @@ class InicioPantalla extends StatefulWidget {
   final PerfilRepositorio perfiles;
   final SenderoRepositorio senderos;
   final UbicacionRepositorio ubicacion;
+  final NotificacionRepositorio notificaciones;
 
   const InicioPantalla({
     super.key,
@@ -20,6 +22,7 @@ class InicioPantalla extends StatefulWidget {
     required this.perfiles,
     required this.senderos,
     required this.ubicacion,
+    required this.notificaciones,
   });
 
   @override
@@ -46,6 +49,7 @@ class _InicioPantallaState extends State<InicioPantalla> {
         1 => MisSenderosPantalla(
           senderos: widget.senderos,
           ubicacion: widget.ubicacion,
+          notificaciones: widget.notificaciones,
         ),
         _ => PerfilPantalla(
           autenticacion: widget.autenticacion,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/model/sendero.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
 import '../mis_senderos/formulario_sendero_pantalla.dart';
@@ -11,12 +12,14 @@ class DetalleSenderoPantalla extends StatelessWidget {
   final Sendero sendero;
   final SenderoRepositorio? senderos;
   final UbicacionRepositorio? ubicacion;
+  final NotificacionRepositorio? notificaciones;
 
   const DetalleSenderoPantalla({
     super.key,
     required this.sendero,
     this.senderos,
     this.ubicacion,
+    this.notificaciones,
   });
 
   // RF3 - Detalle: se muestran los datos técnicos y la información del sendero elegido en Explorar
@@ -31,7 +34,7 @@ class DetalleSenderoPantalla extends StatelessWidget {
       appBar: AppBar(
         title: Text(sendero.nombre),
         actions: [
-          if (senderos != null && ubicacion != null)
+          if (senderos != null && ubicacion != null && notificaciones != null)
             IconButton(
               tooltip: 'Editar',
               icon: const Icon(Icons.edit),
@@ -41,6 +44,7 @@ class DetalleSenderoPantalla extends StatelessWidget {
                   builder: (_) => FormularioSenderoPantalla(
                     senderos: senderos!,
                     ubicacion: ubicacion!,
+                    notificaciones: notificaciones!,
                     sendero: sendero,
                   ),
                 ),

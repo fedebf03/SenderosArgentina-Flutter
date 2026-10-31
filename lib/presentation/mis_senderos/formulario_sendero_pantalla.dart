@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/model/sendero.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
 import 'mapa_ubicacion.dart';
@@ -8,12 +9,14 @@ import 'mapa_ubicacion.dart';
 class FormularioSenderoPantalla extends StatefulWidget {
   final SenderoRepositorio senderos;
   final UbicacionRepositorio ubicacion;
+  final NotificacionRepositorio notificaciones;
   final Sendero? sendero;
 
   const FormularioSenderoPantalla({
     super.key,
     required this.senderos,
     required this.ubicacion,
+    required this.notificaciones,
     this.sendero,
   });
 
@@ -86,6 +89,10 @@ class _FormularioSenderoPantallaState extends State<FormularioSenderoPantalla> {
           longitud: _longitud,
         ),
       );
+      // Si falla el aviso el sendero ya quedó guardado, así que no se muestra error
+      widget.notificaciones
+          .avisar('Sendero guardado', _nombre.text.trim())
+          .ignore();
       if (!mounted) return;
       Navigator.of(context).popUntil((ruta) => ruta.isFirst);
     } catch (_) {
