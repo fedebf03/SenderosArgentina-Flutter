@@ -4,6 +4,7 @@ import '../../domain/repository/autenticacion_repositorio.dart';
 import '../../domain/repository/perfil_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../explorar/explorar_pantalla.dart';
+import '../mis_senderos/mis_senderos_pantalla.dart';
 import '../perfil/perfil_pantalla.dart';
 
 class InicioPantalla extends StatefulWidget {
@@ -37,17 +38,23 @@ class _InicioPantallaState extends State<InicioPantalla> {
           ],
         ),
       ),
-      body: _seccion == 0
-          ? ExplorarPantalla(senderos: widget.senderos)
-          : PerfilPantalla(
-              autenticacion: widget.autenticacion,
-              perfiles: widget.perfiles,
-            ),
+      body: switch (_seccion) {
+        0 => ExplorarPantalla(senderos: widget.senderos),
+        1 => MisSenderosPantalla(senderos: widget.senderos),
+        _ => PerfilPantalla(
+          autenticacion: widget.autenticacion,
+          perfiles: widget.perfiles,
+        ),
+      },
       bottomNavigationBar: NavigationBar(
         selectedIndex: _seccion,
         onDestinationSelected: (indice) => setState(() => _seccion = indice),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.explore), label: 'Explorar'),
+          NavigationDestination(
+            icon: Icon(Icons.hiking),
+            label: 'Mis senderos',
+          ),
           NavigationDestination(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),

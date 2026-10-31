@@ -89,7 +89,7 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
                 padding: const EdgeInsets.all(16),
                 itemCount: senderos.length,
                 itemBuilder: (context, indice) =>
-                    _TarjetaSendero(sendero: senderos[indice]),
+                    TarjetaSendero(sendero: senderos[indice]),
               );
             },
           ),
@@ -99,10 +99,10 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
   }
 }
 
-class _TarjetaSendero extends StatelessWidget {
+class TarjetaSendero extends StatelessWidget {
   final Sendero sendero;
 
-  const _TarjetaSendero({required this.sendero});
+  const TarjetaSendero({super.key, required this.sendero});
 
   @override
   Widget build(BuildContext context) {
