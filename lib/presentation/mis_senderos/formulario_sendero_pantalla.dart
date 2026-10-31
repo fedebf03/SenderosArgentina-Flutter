@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../domain/model/sendero.dart';
 import '../../domain/repository/sendero_repositorio.dart';
+import '../../domain/repository/ubicacion_repositorio.dart';
+import 'mapa_ubicacion.dart';
 
 class FormularioSenderoPantalla extends StatefulWidget {
   final SenderoRepositorio senderos;
+  final UbicacionRepositorio ubicacion;
   final Sendero? sendero;
 
   const FormularioSenderoPantalla({
     super.key,
     required this.senderos,
+    required this.ubicacion,
     this.sendero,
   });
 
@@ -29,7 +33,29 @@ class _FormularioSenderoPantallaState extends State<FormularioSenderoPantalla> {
     text: widget.sendero?.descripcion,
   );
   late Dificultad _dificultad = widget.sendero?.dificultad ?? Dificultad.baja;
+  late double? _latitud = widget.sendero?.latitud;
+  late double? _longitud = widget.sendero?.longitud;
   bool _guardando = false;
+  bool _ubicando = false;
+
+  // RF5 - Geolocalización: el inicio del sendero se guarda con la ubicación actual del usuario
+  Future<void> _usarMiUbicacion() async {
+    setState(() => _ubicando = true);
+    try {
+      final actual = await widget.ubicacion.ubicacionActual();
+      setState(() {
+        _latitud = actual.latitud;
+        _longitud = actual.longitud;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No pudimos obtener tu ubicación')),
+      );
+    } finally {
+      if (mounted) setState(() => _ubicando = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -56,6 +82,8 @@ class _FormularioSenderoPantallaState extends State<FormularioSenderoPantalla> {
           distanciaKilometros: _kilometros(_distancia.text)!,
           dificultad: _dificultad,
           descripcion: _descripcion.text.trim(),
+          latitud: _latitud,
+          longitud: _longitud,
         ),
       );
       if (!mounted) return;
@@ -126,6 +154,14 @@ class _FormularioSenderoPantallaState extends State<FormularioSenderoPantalla> {
               controller: _descripcion,
               decoration: const InputDecoration(labelText: 'Descripción'),
               maxLines: 4,
+            ),
+            const SizedBox(height: 16),
+            if (_latitud != null && _longitud != null)
+              MapaUbicacion(latitud: _latitud!, longitud: _longitud!),
+            OutlinedButton.icon(
+              onPressed: _ubicando ? null : _usarMiUbicacion,
+              icon: const Icon(Icons.my_location),
+              label: Text(_ubicando ? 'Ubicando…' : 'Usar mi ubicación'),
             ),
             const SizedBox(height: 24),
             FilledButton(

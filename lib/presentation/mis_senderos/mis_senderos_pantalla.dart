@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../domain/model/sendero.dart';
 import '../../domain/repository/sendero_repositorio.dart';
+import '../../domain/repository/ubicacion_repositorio.dart';
 import '../explorar/explorar_pantalla.dart';
 import 'formulario_sendero_pantalla.dart';
 
 class MisSenderosPantalla extends StatelessWidget {
   final SenderoRepositorio senderos;
+  final UbicacionRepositorio ubicacion;
 
-  const MisSenderosPantalla({super.key, required this.senderos});
+  const MisSenderosPantalla({
+    super.key,
+    required this.senderos,
+    required this.ubicacion,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +24,10 @@ class MisSenderosPantalla extends StatelessWidget {
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => FormularioSenderoPantalla(senderos: senderos),
+            builder: (_) => FormularioSenderoPantalla(
+              senderos: senderos,
+              ubicacion: ubicacion,
+            ),
           ),
         ),
         child: const Icon(Icons.add),
@@ -44,8 +53,11 @@ class MisSenderosPantalla extends StatelessWidget {
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: lista.length,
-          itemBuilder: (context, indice) =>
-              TarjetaSendero(sendero: lista[indice], senderos: senderos),
+          itemBuilder: (context, indice) => TarjetaSendero(
+            sendero: lista[indice],
+            senderos: senderos,
+            ubicacion: ubicacion,
+          ),
         );
       },
     );

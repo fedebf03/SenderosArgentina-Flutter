@@ -13,6 +13,8 @@ class Sendero {
   final String duracionEstimada;
   final String puntoInicio;
   final String mejorEpoca;
+  final double? latitud;
+  final double? longitud;
 
   Sendero({
     required this.id,
@@ -27,5 +29,7 @@ class Sendero {
     this.duracionEstimada = '',
     this.puntoInicio = '',
     this.mejorEpoca = '',
+    this.latitud,
+    this.longitud,
   });
 }

@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../../domain/model/sendero.dart';
 import '../../domain/repository/sendero_repositorio.dart';
+import '../../domain/repository/ubicacion_repositorio.dart';
 import '../mis_senderos/formulario_sendero_pantalla.dart';
+import '../mis_senderos/mapa_ubicacion.dart';
 import 'datos_sendero.dart';
 
 class DetalleSenderoPantalla extends StatelessWidget {
   final Sendero sendero;
   final SenderoRepositorio? senderos;
+  final UbicacionRepositorio? ubicacion;
 
   const DetalleSenderoPantalla({
     super.key,
     required this.sendero,
     this.senderos,
+    this.ubicacion,
   });
 
   // RF3 - Detalle: se muestran los datos técnicos y la información del sendero elegido en Explorar
@@ -27,7 +31,7 @@ class DetalleSenderoPantalla extends StatelessWidget {
       appBar: AppBar(
         title: Text(sendero.nombre),
         actions: [
-          if (senderos != null)
+          if (senderos != null && ubicacion != null)
             IconButton(
               tooltip: 'Editar',
               icon: const Icon(Icons.edit),
@@ -36,6 +40,7 @@ class DetalleSenderoPantalla extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (_) => FormularioSenderoPantalla(
                     senderos: senderos!,
+                    ubicacion: ubicacion!,
                     sendero: sendero,
                   ),
                 ),
@@ -83,6 +88,13 @@ class DetalleSenderoPantalla extends StatelessWidget {
                 _Seccion('Descripción', sendero.descripcion),
                 _Seccion('Punto de inicio', sendero.puntoInicio),
                 _Seccion('Mejor época', sendero.mejorEpoca),
+                if (sendero.latitud != null && sendero.longitud != null) ...[
+                  const SizedBox(height: 24),
+                  MapaUbicacion(
+                    latitud: sendero.latitud!,
+                    longitud: sendero.longitud!,
+                  ),
+                ],
               ],
             ),
           ),

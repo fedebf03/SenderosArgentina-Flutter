@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../domain/model/sendero.dart';
 import '../../domain/repository/sendero_repositorio.dart';
+import '../../domain/repository/ubicacion_repositorio.dart';
 import 'datos_sendero.dart';
 import 'detalle_sendero_pantalla.dart';
 
@@ -103,8 +104,14 @@ class TarjetaSendero extends StatelessWidget {
   final Sendero sendero;
   // Solo llega desde Mis senderos, para poder editar desde el detalle
   final SenderoRepositorio? senderos;
+  final UbicacionRepositorio? ubicacion;
 
-  const TarjetaSendero({super.key, required this.sendero, this.senderos});
+  const TarjetaSendero({
+    super.key,
+    required this.sendero,
+    this.senderos,
+    this.ubicacion,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -119,8 +126,11 @@ class TarjetaSendero extends StatelessWidget {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) =>
-                DetalleSenderoPantalla(sendero: sendero, senderos: senderos),
+            builder: (_) => DetalleSenderoPantalla(
+              sendero: sendero,
+              senderos: senderos,
+              ubicacion: ubicacion,
+            ),
           ),
         ),
         child: Row(

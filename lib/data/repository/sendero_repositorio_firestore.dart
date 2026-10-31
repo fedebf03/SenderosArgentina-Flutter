@@ -61,12 +61,17 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
       'distanciaKilometros': sendero.distanciaKilometros,
       'dificultad': sendero.dificultad.name.toUpperCase(),
       'descripcion': sendero.descripcion,
+      'latitudInicio': sendero.latitud,
+      'longitudInicio': sendero.longitud,
       'eliminado': false,
       'fechaModificacion': DateTime.now().millisecondsSinceEpoch,
     }, SetOptions(merge: true));
   }
 
   Sendero _sendero(String id, Map sendero, {String autor = ''}) {
+    // Los senderos creados en la otra app no tienen inicio guardado, se usa el primer punto del trazado
+    final List recorrido = sendero['recorrido'] ?? [];
+    final primerPunto = recorrido.isEmpty ? {} : recorrido.first;
     return Sendero(
       id: id,
       nombre: sendero['nombre'] ?? '',
@@ -80,6 +85,9 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
       duracionEstimada: sendero['duracionEstimada'] ?? '',
       puntoInicio: sendero['puntoInicio'] ?? '',
       mejorEpoca: sendero['mejorEpoca'] ?? '',
+      latitud: (sendero['latitudInicio'] ?? primerPunto['latitud'])?.toDouble(),
+      longitud: (sendero['longitudInicio'] ?? primerPunto['longitud'])
+          ?.toDouble(),
     );
   }
 
