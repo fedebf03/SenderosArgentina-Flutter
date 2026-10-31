@@ -62,6 +62,26 @@ class AutenticacionRepositorioFirebase implements AutenticacionRepositorio {
     }
   }
 
+  // RF1 - Recuperación: si el correo no tiene cuenta se toma como enviado, así no se revela qué correos están registrados
+  @override
+  Future<void> enviarCorreoRecuperacion(String correo) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: correo);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') return;
+      throw ErrorAutenticacion(
+        _mensajeDeError(
+          e.code,
+          porDefecto: 'No pudimos enviar el correo. Intentá de nuevo.',
+        ),
+      );
+    } catch (_) {
+      throw ErrorAutenticacion(
+        'No pudimos enviar el correo. Intentá de nuevo.',
+      );
+    }
+  }
+
   @override
   Usuario? usuarioActual() => _aUsuario(_auth.currentUser);
 

@@ -13,6 +13,8 @@ abstract class AutenticacionRepositorio {
 
   Future<void> registrar(String correo, String clave);
 
+  Future<void> enviarCorreoRecuperacion(String correo);
+
   Usuario? usuarioActual();
 
   Stream<Usuario?> cambiosDeSesion();

@@ -56,6 +56,58 @@ class _LoginPantallaState extends State<LoginPantalla> {
     }
   }
 
+  Future<void> _recuperarClave() async {
+    var correo = _correoController.text.trim();
+    final enviar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Recuperar contraseña'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Te enviamos un enlace para que elijas una contraseña nueva.',
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              initialValue: correo,
+              onChanged: (texto) => correo = texto.trim(),
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Correo electrónico',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Enviar enlace'),
+          ),
+        ],
+      ),
+    );
+    if (enviar != true || !mounted) return;
+
+    var mensaje = 'Revisá tu correo para elegir una contraseña nueva';
+    if (!correo.contains('@') || !correo.contains('.')) {
+      mensaje = 'El correo no tiene un formato válido';
+    } else {
+      try {
+        await widget.repositorio.enviarCorreoRecuperacion(correo);
+      } on ErrorAutenticacion catch (e) {
+        mensaje = e.mensaje;
+      }
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mensaje)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,7 +165,14 @@ class _LoginPantallaState extends State<LoginPantalla> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 24),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _recuperarClave,
+                    child: const Text('¿Olvidaste tu contraseña?'),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 FilledButton(
                   onPressed: _cargando ? null : _iniciarSesion,
                   child: _cargando
