@@ -41,6 +41,31 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
         );
   }
 
+  // RF4 - Crear y editar: sin id se crea un documento nuevo, con id se actualiza el existente
+  @override
+  Future<void> guardarSendero(Sendero sendero) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) throw Exception('No hay sesión iniciada');
+    final coleccion = FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uid)
+        .collection('senderos');
+    final documento = sendero.id.isEmpty
+        ? coleccion.doc()
+        : coleccion.doc(sendero.id);
+    // Con merge no se pierden los campos que solo usa la otra app, como el trazado
+    await documento.set({
+      'id': documento.id,
+      'nombre': sendero.nombre,
+      'region': sendero.region,
+      'distanciaKilometros': sendero.distanciaKilometros,
+      'dificultad': sendero.dificultad.name.toUpperCase(),
+      'descripcion': sendero.descripcion,
+      'eliminado': false,
+      'fechaModificacion': DateTime.now().millisecondsSinceEpoch,
+    }, SetOptions(merge: true));
+  }
+
   Sendero _sendero(String id, Map sendero, {String autor = ''}) {
     return Sendero(
       id: id,

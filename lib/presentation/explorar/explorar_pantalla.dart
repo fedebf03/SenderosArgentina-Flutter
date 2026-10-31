@@ -101,8 +101,10 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
 
 class TarjetaSendero extends StatelessWidget {
   final Sendero sendero;
+  // Solo llega desde Mis senderos, para poder editar desde el detalle
+  final SenderoRepositorio? senderos;
 
-  const TarjetaSendero({super.key, required this.sendero});
+  const TarjetaSendero({super.key, required this.sendero, this.senderos});
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +119,8 @@ class TarjetaSendero extends StatelessWidget {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => DetalleSenderoPantalla(sendero: sendero),
+            builder: (_) =>
+                DetalleSenderoPantalla(sendero: sendero, senderos: senderos),
           ),
         ),
         child: Row(
