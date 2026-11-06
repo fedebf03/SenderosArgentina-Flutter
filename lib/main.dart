@@ -2,9 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'data/repository/autenticacion_repositorio_firebase.dart';
-import 'data/repository/notificacion_repositorio_local.dart';
+import 'data/repository/foto_repositorio_cloudinary.dart';
 import 'data/repository/perfil_repositorio_firestore.dart';
 import 'data/repository/sendero_repositorio_firestore.dart';
+import 'data/repository/sensores_repositorio_sensors_plus.dart';
 import 'data/repository/ubicacion_repositorio_geolocator.dart';
 import 'domain/model/usuario.dart';
 import 'presentation/auth/login_pantalla.dart';
@@ -27,7 +28,8 @@ class SenderosApp extends StatelessWidget {
     final perfiles = PerfilRepositorioFirestore();
     final senderos = SenderoRepositorioFirestore();
     final ubicacion = UbicacionRepositorioGeolocator();
-    final notificaciones = NotificacionRepositorioLocal();
+    final fotos = FotoRepositorioCloudinary();
+    final sensores = SensoresRepositorioSensorsPlus();
     return MaterialApp(
       title: 'Senderos Argentina',
       debugShowCheckedModeBanner: false,
@@ -42,7 +44,8 @@ class SenderosApp extends StatelessWidget {
                 perfiles: perfiles,
                 senderos: senderos,
                 ubicacion: ubicacion,
-                notificaciones: notificaciones,
+                fotos: fotos,
+                sensores: sensores,
               )
             : LoginPantalla(repositorio: autenticacion),
       ),
