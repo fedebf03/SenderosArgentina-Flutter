@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/repository/autenticacion_repositorio.dart';
-import '../../domain/repository/notificacion_repositorio.dart';
+import '../../domain/repository/foto_repositorio.dart';
 import '../../domain/repository/perfil_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
+import '../../domain/repository/sensores_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
 import '../explorar/explorar_pantalla.dart';
-import '../mis_senderos/mis_senderos_pantalla.dart';
 import '../perfil/perfil_pantalla.dart';
 
 class InicioPantalla extends StatefulWidget {
@@ -14,7 +14,8 @@ class InicioPantalla extends StatefulWidget {
   final PerfilRepositorio perfiles;
   final SenderoRepositorio senderos;
   final UbicacionRepositorio ubicacion;
-  final NotificacionRepositorio notificaciones;
+  final FotoRepositorio fotos;
+  final SensoresRepositorio sensores;
 
   const InicioPantalla({
     super.key,
@@ -22,7 +23,8 @@ class InicioPantalla extends StatefulWidget {
     required this.perfiles,
     required this.senderos,
     required this.ubicacion,
-    required this.notificaciones,
+    required this.fotos,
+    required this.sensores,
   });
 
   @override
@@ -45,11 +47,11 @@ class _InicioPantallaState extends State<InicioPantalla> {
         ),
       ),
       body: switch (_seccion) {
-        0 => ExplorarPantalla(senderos: widget.senderos),
-        1 => MisSenderosPantalla(
+        0 => ExplorarPantalla(
           senderos: widget.senderos,
           ubicacion: widget.ubicacion,
-          notificaciones: widget.notificaciones,
+          fotos: widget.fotos,
+          sensores: widget.sensores,
         ),
         _ => PerfilPantalla(
           autenticacion: widget.autenticacion,
@@ -61,10 +63,6 @@ class _InicioPantallaState extends State<InicioPantalla> {
         onDestinationSelected: (indice) => setState(() => _seccion = indice),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.explore), label: 'Explorar'),
-          NavigationDestination(
-            icon: Icon(Icons.hiking),
-            label: 'Mis senderos',
-          ),
           NavigationDestination(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),
