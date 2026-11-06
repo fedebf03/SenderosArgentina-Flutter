@@ -1,3 +1,5 @@
+import 'punto.dart';
+
 enum Dificultad { baja, media, alta }
 
 class Sendero {
@@ -15,6 +17,8 @@ class Sendero {
   final String mejorEpoca;
   final double? latitud;
   final double? longitud;
+  final List<Punto> recorrido;
+  final String idOrigen;
 
   Sendero({
     required this.id,
@@ -31,5 +35,7 @@ class Sendero {
     this.mejorEpoca = '',
     this.latitud,
     this.longitud,
+    this.recorrido = const [],
+    this.idOrigen = '',
   });
 }
