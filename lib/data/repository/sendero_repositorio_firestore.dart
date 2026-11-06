@@ -1,26 +1,59 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../domain/model/punto.dart';
 import '../../domain/model/sendero.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 
 class SenderoRepositorioFirestore implements SenderoRepositorio {
   // RF2 - Explorar: traemos los senderos que publicaron todos los usuarios, del más nuevo al más viejo
   @override
-  Future<List<Sendero>> obtenerSenderos() async {
-    final consulta = await FirebaseFirestore.instance
+  Stream<List<Sendero>> senderosPublicos() {
+    return FirebaseFirestore.instance
         .collection('senderosPublicos')
         .orderBy('fechaPublicacion', descending: true)
-        .get();
-    return consulta.docs.map((documento) {
-      final publicado = documento.data();
-      return _sendero(
-        documento.id,
-        publicado['sendero'] ?? {},
-        autor: publicado['nombreAutor'] ?? '',
-      );
-    }).toList();
+        .snapshots()
+        .map(
+          (consulta) => consulta.docs.map((documento) {
+            final publicado = documento.data();
+            return _sendero(
+              documento.id,
+              publicado['sendero'] ?? {},
+              autor: publicado['nombreAutor'] ?? '',
+            );
+          }).toList(),
+        );
   }
+
+  // RF2 - Publicar: se copia el sendero entero con el mismo id, así las dos apps lo leen igual
+  @override
+  Future<void> publicar(String idSendero) async {
+    final usuario = FirebaseAuth.instance.currentUser!;
+    final propio = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(usuario.uid)
+        .collection('senderos')
+        .doc(idSendero)
+        .get();
+    final nombre = usuario.displayName ?? '';
+    await FirebaseFirestore.instance
+        .collection('senderosPublicos')
+        .doc(idSendero)
+        .set({
+          'idAutor': usuario.uid,
+          'nombreAutor': nombre.isNotEmpty
+              ? nombre
+              : usuario.email!.split('@').first,
+          'fechaPublicacion': DateTime.now().millisecondsSinceEpoch,
+          'sendero': propio.data(),
+        });
+  }
+
+  @override
+  Future<void> despublicar(String idSendero) => FirebaseFirestore.instance
+      .collection('senderosPublicos')
+      .doc(idSendero)
+      .delete();
 
   // RF2 - Mis senderos: solo los del usuario con sesión, y la lista se actualiza sola al guardar
   @override
@@ -53,7 +86,7 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
     final documento = sendero.id.isEmpty
         ? coleccion.doc()
         : coleccion.doc(sendero.id);
-    // Con merge no se pierden los campos que solo usa la otra app, como el trazado
+    // Con merge no se pierden los campos que solo usa la otra app
     await documento.set({
       'id': documento.id,
       'nombre': sendero.nombre,
@@ -61,8 +94,14 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
       'distanciaKilometros': sendero.distanciaKilometros,
       'dificultad': sendero.dificultad.name.toUpperCase(),
       'descripcion': sendero.descripcion,
+      'foto': sendero.foto,
       'latitudInicio': sendero.latitud,
       'longitudInicio': sendero.longitud,
+      'recorrido': sendero.recorrido
+          .map(
+            (punto) => {'latitud': punto.latitud, 'longitud': punto.longitud},
+          )
+          .toList(),
       'eliminado': false,
       'fechaModificacion': DateTime.now().millisecondsSinceEpoch,
     }, SetOptions(merge: true));
@@ -88,6 +127,15 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
       latitud: (sendero['latitudInicio'] ?? primerPunto['latitud'])?.toDouble(),
       longitud: (sendero['longitudInicio'] ?? primerPunto['longitud'])
           ?.toDouble(),
+      recorrido: recorrido
+          .map(
+            (punto) => Punto(
+              (punto['latitud'] as num).toDouble(),
+              (punto['longitud'] as num).toDouble(),
+            ),
+          )
+          .toList(),
+      idOrigen: sendero['idOrigen'] ?? '',
     );
   }
 

@@ -19,7 +19,7 @@ class IndicadorDificultad extends StatelessWidget {
     Dificultad.media: Color(0xFFC77700),
     Dificultad.alta: Color(0xFFBA1A1A),
   };
-  static const _textos = {
+  static const textos = {
     Dificultad.baja: 'Baja',
     Dificultad.media: 'Media',
     Dificultad.alta: 'Alta',
@@ -43,9 +43,33 @@ class IndicadorDificultad extends StatelessWidget {
           ),
         const SizedBox(width: 4),
         Text(
-          _textos[dificultad]!,
+          textos[dificultad]!,
           style: tema.textTheme.bodySmall?.copyWith(
             color: tema.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class DatoSendero extends StatelessWidget {
+  final String titulo;
+  final String valor;
+
+  const DatoSendero(this.titulo, this.valor, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(titulo, style: tema.textTheme.labelSmall),
+        Text(
+          valor,
+          style: tema.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
