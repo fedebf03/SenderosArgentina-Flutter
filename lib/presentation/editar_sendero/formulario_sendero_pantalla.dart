@@ -8,7 +8,7 @@ import '../../domain/model/sendero.dart';
 import '../../domain/repository/foto_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
-import 'mapa_sendero.dart';
+import '../explorar/mapa_sendero.dart';
 
 class FormularioSenderoPantalla extends StatefulWidget {
   final SenderoRepositorio senderos;

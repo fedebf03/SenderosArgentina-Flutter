@@ -6,10 +6,10 @@ import '../../domain/repository/foto_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../../domain/repository/sensores_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
-import '../mis_senderos/formulario_sendero_pantalla.dart';
-import '../mis_senderos/mapa_sendero.dart';
+import '../editar_sendero/formulario_sendero_pantalla.dart';
 import '../recorrido/recorrido_pantalla.dart';
 import 'datos_sendero.dart';
+import 'mapa_sendero.dart';
 
 class DetalleSenderoPantalla extends StatelessWidget {
   final Sendero sendero;

@@ -6,7 +6,7 @@ import '../../domain/repository/foto_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../../domain/repository/sensores_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
-import '../mis_senderos/formulario_sendero_pantalla.dart';
+import '../editar_sendero/formulario_sendero_pantalla.dart';
 import 'datos_sendero.dart';
 import 'detalle_sendero_pantalla.dart';
 

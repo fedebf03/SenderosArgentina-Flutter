@@ -4,7 +4,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 import '../../domain/repository/sensores_repositorio.dart';
 
-class SensoresRepositorioSensorsPlus implements SensoresRepositorio {
+class SensoresRepositorioCelular implements SensoresRepositorio {
   // RF6 - Brújula: el rumbo sale del magnetómetro, con el celular apoyado horizontal
   @override
   Stream<double> rumbo() => magnetometerEventStream().map(
