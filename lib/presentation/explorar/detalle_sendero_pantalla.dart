@@ -48,6 +48,38 @@ class DetalleSenderoPantalla extends StatelessWidget {
     }
   }
 
+  // RF4 - Eliminar: se pide confirmación antes de borrar y después se vuelve a Explorar
+  Future<void> _eliminar(BuildContext context) async {
+    final navegador = Navigator.of(context);
+    final mensajes = ScaffoldMessenger.of(context);
+    final confirmado = await showDialog<bool>(
+      context: context,
+      builder: (dialogo) => AlertDialog(
+        title: const Text('¿Eliminar este sendero?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogo, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogo, true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmado != true) return;
+    try {
+      await senderos!.eliminarSendero(sendero.id);
+      navegador.pop();
+      mensajes.showSnackBar(const SnackBar(content: Text('Sendero eliminado')));
+    } catch (_) {
+      mensajes.showSnackBar(
+        const SnackBar(content: Text('No pudimos eliminar el sendero')),
+      );
+    }
+  }
+
   // RF3 - Detalle: se muestran los datos técnicos y la información del sendero elegido en Explorar
   @override
   Widget build(BuildContext context) {
@@ -88,6 +120,10 @@ class DetalleSenderoPantalla extends StatelessWidget {
                     PopupMenuItem(
                       onTap: () => _cambiarPublicacion(context, publicado),
                       child: Text(publicado ? 'Dejar de publicar' : 'Publicar'),
+                    ),
+                    PopupMenuItem(
+                      onTap: () => _eliminar(context),
+                      child: const Text('Eliminar'),
                     ),
                   ],
                 );

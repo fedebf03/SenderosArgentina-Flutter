@@ -25,7 +25,7 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
         );
   }
 
-  // RF2 - Publicar: se copia el sendero entero con el mismo id, así las dos apps lo leen igual
+  // RF2 - Publicar: el sendero se copia entero a los públicos con el mismo id que en Mis senderos
   @override
   Future<void> publicar(String idSendero) async {
     final usuario = FirebaseAuth.instance.currentUser!;
@@ -55,6 +55,27 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
       .doc(idSendero)
       .delete();
 
+  // RF4 - Eliminar: el sendero queda marcado como eliminado y, si era público, deja de serlo
+  @override
+  Future<void> eliminarSendero(String idSendero) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) throw Exception('No hay sesión iniciada');
+    await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uid)
+        .collection('senderos')
+        .doc(idSendero)
+        .update({
+          'eliminado': true,
+          'fechaModificacion': DateTime.now().millisecondsSinceEpoch,
+        });
+    // Las reglas no dejan borrar un público que no existe, por eso se revisa antes
+    final publico = FirebaseFirestore.instance
+        .collection('senderosPublicos')
+        .doc(idSendero);
+    if ((await publico.get()).exists) await publico.delete();
+  }
+
   // RF2 - Mis senderos: solo los del usuario con sesión, y la lista se actualiza sola al guardar
   @override
   Stream<List<Sendero>> misSenderos() {
@@ -67,7 +88,7 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
         .snapshots()
         .map(
           (consulta) => consulta.docs
-              // La otra app no borra el documento, lo marca como eliminado
+              // Los senderos borrados quedan marcados como eliminados y no se muestran
               .where((documento) => documento.data()['eliminado'] != true)
               .map((documento) => _sendero(documento.id, documento.data()))
               .toList(),
@@ -86,7 +107,7 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
     final documento = sendero.id.isEmpty
         ? coleccion.doc()
         : coleccion.doc(sendero.id);
-    // Con merge no se pierden los campos que solo usa la otra app
+    // Con merge se conservan los campos que el formulario no edita
     await documento.set({
       'id': documento.id,
       'nombre': sendero.nombre,
@@ -108,7 +129,7 @@ class SenderoRepositorioFirestore implements SenderoRepositorio {
   }
 
   Sendero _sendero(String id, Map sendero, {String autor = ''}) {
-    // Los senderos creados en la otra app no tienen inicio guardado, se usa el primer punto del trazado
+    // Si el sendero no tiene inicio guardado, se usa el primer punto del trazado
     final List recorrido = sendero['recorrido'] ?? [];
     final primerPunto = recorrido.isEmpty ? {} : recorrido.first;
     return Sendero(

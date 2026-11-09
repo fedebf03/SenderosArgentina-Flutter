@@ -10,4 +10,6 @@ abstract class SenderoRepositorio {
   Future<void> publicar(String idSendero);
 
   Future<void> despublicar(String idSendero);
+
+  Future<void> eliminarSendero(String idSendero);
 }

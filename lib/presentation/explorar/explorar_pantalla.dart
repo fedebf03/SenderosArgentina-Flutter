@@ -183,7 +183,6 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
     if (publicos.isEmpty && mios.isEmpty) {
       return const Center(child: Text('Todavía no hay senderos'));
     }
-    // La otra app guarda en la cuenta una copia de cada sendero público que se guarda; se muestra el original
     final propios = mios.where((sendero) => sendero.idOrigen.isEmpty).toList();
     final idsPropios = propios.map((sendero) => sendero.id).toSet();
     final ajenos = publicos
