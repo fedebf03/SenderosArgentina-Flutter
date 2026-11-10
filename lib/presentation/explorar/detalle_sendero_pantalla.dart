@@ -4,6 +4,7 @@ import '../../domain/model/punto.dart';
 import '../../domain/model/sendero.dart';
 import '../../domain/repository/foto_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/sensores_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
 import '../editar_sendero/formulario_sendero_pantalla.dart';
@@ -15,6 +16,7 @@ class DetalleSenderoPantalla extends StatelessWidget {
   final Sendero sendero;
   final UbicacionRepositorio ubicacion;
   final SensoresRepositorio sensores;
+  final NotificacionRepositorio notificaciones;
   final SenderoRepositorio? senderos;
   final FotoRepositorio? fotos;
 
@@ -23,6 +25,7 @@ class DetalleSenderoPantalla extends StatelessWidget {
     required this.sendero,
     required this.ubicacion,
     required this.sensores,
+    required this.notificaciones,
     this.senderos,
     this.fotos,
   });
@@ -192,6 +195,7 @@ class DetalleSenderoPantalla extends StatelessWidget {
                           sendero: sendero,
                           ubicacion: ubicacion,
                           sensores: sensores,
+                          notificaciones: notificaciones,
                         ),
                       ),
                     ),

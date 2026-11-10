@@ -4,6 +4,7 @@ import '../../domain/model/punto.dart';
 import '../../domain/model/sendero.dart';
 import '../../domain/repository/foto_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/sensores_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
 import '../editar_sendero/formulario_sendero_pantalla.dart';
@@ -15,6 +16,7 @@ class ExplorarPantalla extends StatefulWidget {
   final UbicacionRepositorio ubicacion;
   final FotoRepositorio fotos;
   final SensoresRepositorio sensores;
+  final NotificacionRepositorio notificaciones;
 
   const ExplorarPantalla({
     super.key,
@@ -22,6 +24,7 @@ class ExplorarPantalla extends StatefulWidget {
     required this.ubicacion,
     required this.fotos,
     required this.sensores,
+    required this.notificaciones,
   });
 
   @override
@@ -203,6 +206,7 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
             sendero: sendero,
             ubicacion: widget.ubicacion,
             sensores: widget.sensores,
+            notificaciones: widget.notificaciones,
             senderos: propios.contains(sendero) ? widget.senderos : null,
             fotos: propios.contains(sendero) ? widget.fotos : null,
           ),
@@ -215,6 +219,7 @@ class TarjetaSendero extends StatelessWidget {
   final Sendero sendero;
   final UbicacionRepositorio ubicacion;
   final SensoresRepositorio sensores;
+  final NotificacionRepositorio notificaciones;
   // Solo llegan en los senderos propios, para poder editar desde el detalle
   final SenderoRepositorio? senderos;
   final FotoRepositorio? fotos;
@@ -224,6 +229,7 @@ class TarjetaSendero extends StatelessWidget {
     required this.sendero,
     required this.ubicacion,
     required this.sensores,
+    required this.notificaciones,
     this.senderos,
     this.fotos,
   });
@@ -245,6 +251,7 @@ class TarjetaSendero extends StatelessWidget {
               sendero: sendero,
               ubicacion: ubicacion,
               sensores: sensores,
+              notificaciones: notificaciones,
               senderos: senderos,
               fotos: fotos,
             ),

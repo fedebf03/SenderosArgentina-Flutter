@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/model/preferencias.dart';
 import '../../domain/repository/autenticacion_repositorio.dart';
 import '../../domain/repository/foto_repositorio.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/perfil_repositorio.dart';
+import '../../domain/repository/preferencias_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
 import '../../domain/repository/sensores_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
@@ -16,6 +19,9 @@ class InicioPantalla extends StatefulWidget {
   final UbicacionRepositorio ubicacion;
   final FotoRepositorio fotos;
   final SensoresRepositorio sensores;
+  final PreferenciasRepositorio preferencias;
+  final ValueNotifier<Preferencias> estadoPreferencias;
+  final NotificacionRepositorio notificaciones;
 
   const InicioPantalla({
     super.key,
@@ -25,6 +31,9 @@ class InicioPantalla extends StatefulWidget {
     required this.ubicacion,
     required this.fotos,
     required this.sensores,
+    required this.preferencias,
+    required this.estadoPreferencias,
+    required this.notificaciones,
   });
 
   @override
@@ -52,10 +61,14 @@ class _InicioPantallaState extends State<InicioPantalla> {
           ubicacion: widget.ubicacion,
           fotos: widget.fotos,
           sensores: widget.sensores,
+          notificaciones: widget.notificaciones,
         ),
         _ => PerfilPantalla(
           autenticacion: widget.autenticacion,
           perfiles: widget.perfiles,
+          preferencias: widget.preferencias,
+          estadoPreferencias: widget.estadoPreferencias,
+          notificaciones: widget.notificaciones,
         ),
       },
       bottomNavigationBar: NavigationBar(

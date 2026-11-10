@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../domain/model/punto.dart';
 import '../../domain/model/sendero.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/sensores_repositorio.dart';
 import '../../domain/repository/ubicacion_repositorio.dart';
 import '../explorar/datos_sendero.dart';
@@ -14,12 +15,14 @@ class RecorridoPantalla extends StatefulWidget {
   final Sendero sendero;
   final UbicacionRepositorio ubicacion;
   final SensoresRepositorio sensores;
+  final NotificacionRepositorio notificaciones;
 
   const RecorridoPantalla({
     super.key,
     required this.sendero,
     required this.ubicacion,
     required this.sensores,
+    required this.notificaciones,
   });
 
   @override
@@ -38,6 +41,13 @@ class _RecorridoPantallaState extends State<RecorridoPantalla> {
   @override
   void initState() {
     super.initState();
+    // RF7 - Notificaciones: avisar que empezó el recorrido
+    unawaited(
+      widget.notificaciones.avisar(
+        'Recorrido iniciado',
+        'Arrancaste ${widget.sendero.nombre}. ¡Buen camino!',
+      ),
+    );
     _suscripciones.addAll([
       widget.ubicacion.seguirUbicacion().listen(
         (actual) => setState(() {
@@ -66,6 +76,13 @@ class _RecorridoPantallaState extends State<RecorridoPantalla> {
     for (final suscripcion in _suscripciones) {
       suscripcion.cancel();
     }
+    // Avisar el fin al salir, ya sea con Finalizar o con la flecha de atrás
+    unawaited(
+      widget.notificaciones.avisar(
+        'Recorrido finalizado',
+        '${widget.sendero.nombre}: ${kilometros(_recorridos)} y $_pasos pasos',
+      ),
+    );
     super.dispose();
   }
 
