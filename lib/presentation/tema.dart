@@ -28,7 +28,6 @@ final ThemeData temaSenderos = ThemeData(
   ),
 );
 
-// Modo oscuro: misma paleta azul, aclarada para leerse bien sobre fondo oscuro
 final ThemeData temaSenderosOscuro = ThemeData(
   colorScheme: const ColorScheme.dark(
     primary: Color(0xFF9CC7EE),

@@ -17,31 +17,26 @@ import 'presentation/inicio/inicio_pantalla.dart';
 import 'presentation/tema.dart';
 
 Future<void> main() async {
-  // Firebase tiene que estar listo antes de dibujar la primera pantalla
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // Leer las preferencias antes de dibujar para no mostrar un tema y cambiarlo enseguida
+  // El tema guardado se lee antes de dibujar para que no aparezca uno y cambie enseguida
   final preferencias = PreferenciasRepositorioLocal();
-  final iniciales = await preferencias.obtener();
+  final modoTema = await preferencias.modoTema();
   runApp(
-    SenderosApp(
-      preferencias: preferencias,
-      estadoPreferencias: ValueNotifier(iniciales),
-    ),
+    SenderosApp(preferencias: preferencias, modoTema: ValueNotifier(modoTema)),
   );
 }
 
 class SenderosApp extends StatelessWidget {
   final PreferenciasRepositorio preferencias;
-  final ValueNotifier<Preferencias> estadoPreferencias;
+  final ValueNotifier<ModoTema> modoTema;
 
   const SenderosApp({
     super.key,
     required this.preferencias,
-    required this.estadoPreferencias,
+    required this.modoTema,
   });
 
-  // Convertir el modo elegido por el usuario al modo de tema de Flutter
   ThemeMode _modoFlutter(ModoTema modo) => switch (modo) {
     ModoTema.sistema => ThemeMode.system,
     ModoTema.claro => ThemeMode.light,
@@ -57,15 +52,14 @@ class SenderosApp extends StatelessWidget {
     final fotos = FotoRepositorioCloudinary();
     final sensores = SensoresRepositorioCelular();
     final notificaciones = NotificacionRepositorioLocal();
-    // Modo oscuro: la app se vuelve a pintar sola cuando cambia la preferencia
-    return ValueListenableBuilder<Preferencias>(
-      valueListenable: estadoPreferencias,
-      builder: (context, actuales, _) => MaterialApp(
+    return ValueListenableBuilder<ModoTema>(
+      valueListenable: modoTema,
+      builder: (context, modo, _) => MaterialApp(
         title: 'Senderos Argentina',
         debugShowCheckedModeBanner: false,
         theme: temaSenderos,
         darkTheme: temaSenderosOscuro,
-        themeMode: _modoFlutter(actuales.modoTema),
+        themeMode: _modoFlutter(modo),
         // Al iniciar o cerrar sesión la pantalla principal cambia sola, sin navegar a mano
         home: StreamBuilder<Usuario?>(
           stream: autenticacion.cambiosDeSesion(),
@@ -79,7 +73,7 @@ class SenderosApp extends StatelessWidget {
                   fotos: fotos,
                   sensores: sensores,
                   preferencias: preferencias,
-                  estadoPreferencias: estadoPreferencias,
+                  modoTema: modoTema,
                   notificaciones: notificaciones,
                 )
               : LoginPantalla(repositorio: autenticacion),

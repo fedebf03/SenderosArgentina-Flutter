@@ -20,7 +20,7 @@ class InicioPantalla extends StatefulWidget {
   final FotoRepositorio fotos;
   final SensoresRepositorio sensores;
   final PreferenciasRepositorio preferencias;
-  final ValueNotifier<Preferencias> estadoPreferencias;
+  final ValueNotifier<ModoTema> modoTema;
   final NotificacionRepositorio notificaciones;
 
   const InicioPantalla({
@@ -32,7 +32,7 @@ class InicioPantalla extends StatefulWidget {
     required this.fotos,
     required this.sensores,
     required this.preferencias,
-    required this.estadoPreferencias,
+    required this.modoTema,
     required this.notificaciones,
   });
 
@@ -67,8 +67,7 @@ class _InicioPantallaState extends State<InicioPantalla> {
           autenticacion: widget.autenticacion,
           perfiles: widget.perfiles,
           preferencias: widget.preferencias,
-          estadoPreferencias: widget.estadoPreferencias,
-          notificaciones: widget.notificaciones,
+          modoTema: widget.modoTema,
         ),
       },
       bottomNavigationBar: NavigationBar(

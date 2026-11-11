@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../domain/model/perfil.dart';
 import '../../domain/model/preferencias.dart';
 import '../../domain/repository/autenticacion_repositorio.dart';
-import '../../domain/repository/notificacion_repositorio.dart';
 import '../../domain/repository/perfil_repositorio.dart';
 import '../../domain/repository/preferencias_repositorio.dart';
 import 'editar_perfil_pantalla.dart';
@@ -12,16 +11,14 @@ class PerfilPantalla extends StatefulWidget {
   final AutenticacionRepositorio autenticacion;
   final PerfilRepositorio perfiles;
   final PreferenciasRepositorio preferencias;
-  final ValueNotifier<Preferencias> estadoPreferencias;
-  final NotificacionRepositorio notificaciones;
+  final ValueNotifier<ModoTema> modoTema;
 
   const PerfilPantalla({
     super.key,
     required this.autenticacion,
     required this.perfiles,
     required this.preferencias,
-    required this.estadoPreferencias,
-    required this.notificaciones,
+    required this.modoTema,
   });
 
   @override
@@ -46,42 +43,9 @@ class _PerfilPantallaState extends State<PerfilPantalla> {
     }
   }
 
-  // Preferencias: aplicar el cambio al instante y guardarlo en el celular
-  Future<void> _cambiarPreferencias(Preferencias nuevas) async {
-    final anteriores = widget.estadoPreferencias.value;
-    widget.estadoPreferencias.value = nuevas;
-    final cambioRecordatorio =
-        nuevas.recordatorioActivo != anteriores.recordatorioActivo ||
-        nuevas.horaRecordatorio != anteriores.horaRecordatorio ||
-        nuevas.minutoRecordatorio != anteriores.minutoRecordatorio;
-    if (cambioRecordatorio) {
-      // Reprogramar con la hora nueva (mismo id, reemplaza al anterior)
-      nuevas.recordatorioActivo
-          ? await widget.notificaciones.activarRecordatorio(
-              nuevas.horaRecordatorio,
-              nuevas.minutoRecordatorio,
-            )
-          : await widget.notificaciones.desactivarRecordatorio();
-    }
-    await widget.preferencias.guardar(nuevas);
-  }
-
-  // Abrir el reloj para elegir la hora del recordatorio
-  Future<void> _elegirHora(Preferencias actuales) async {
-    final elegida = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(
-        hour: actuales.horaRecordatorio,
-        minute: actuales.minutoRecordatorio,
-      ),
-    );
-    if (elegida == null) return;
-    await _cambiarPreferencias(
-      actuales.copiarCon(
-        horaRecordatorio: elegida.hour,
-        minutoRecordatorio: elegida.minute,
-      ),
-    );
+  Future<void> _cambiarModoTema(ModoTema modo) async {
+    widget.modoTema.value = modo;
+    await widget.preferencias.guardarModoTema(modo);
   }
 
   Future<void> _cerrarSesion() async {
@@ -184,55 +148,29 @@ class _PerfilPantallaState extends State<PerfilPantalla> {
                 const SizedBox(height: 32),
                 Text('Preferencias', style: tema.textTheme.titleMedium),
                 const SizedBox(height: 12),
-                ValueListenableBuilder<Preferencias>(
-                  valueListenable: widget.estadoPreferencias,
-                  builder: (context, actuales, _) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SegmentedButton<ModoTema>(
-                        segments: const [
-                          ButtonSegment(
-                            value: ModoTema.sistema,
-                            icon: Icon(Icons.brightness_auto),
-                            label: Text('Sistema'),
-                          ),
-                          ButtonSegment(
-                            value: ModoTema.claro,
-                            icon: Icon(Icons.light_mode),
-                            label: Text('Claro'),
-                          ),
-                          ButtonSegment(
-                            value: ModoTema.oscuro,
-                            icon: Icon(Icons.dark_mode),
-                            label: Text('Oscuro'),
-                          ),
-                        ],
-                        selected: {actuales.modoTema},
-                        onSelectionChanged: (elegido) => _cambiarPreferencias(
-                          actuales.copiarCon(modoTema: elegido.first),
-                        ),
+                ValueListenableBuilder<ModoTema>(
+                  valueListenable: widget.modoTema,
+                  builder: (context, modo, _) => SegmentedButton<ModoTema>(
+                    segments: const [
+                      ButtonSegment(
+                        value: ModoTema.sistema,
+                        icon: Icon(Icons.brightness_auto),
+                        label: Text('Sistema'),
                       ),
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        secondary: const Icon(Icons.notifications_outlined),
-                        title: const Text('Recordarme salir a caminar'),
-                        subtitle: Text(
-                          'Todos los días a las '
-                          '${TimeOfDay(hour: actuales.horaRecordatorio, minute: actuales.minutoRecordatorio).format(context)}',
-                        ),
-                        value: actuales.recordatorioActivo,
-                        onChanged: (activo) => _cambiarPreferencias(
-                          actuales.copiarCon(recordatorioActivo: activo),
-                        ),
+                      ButtonSegment(
+                        value: ModoTema.claro,
+                        icon: Icon(Icons.light_mode),
+                        label: Text('Claro'),
                       ),
-                      if (actuales.recordatorioActivo)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.schedule),
-                          title: const Text('Cambiar hora'),
-                          onTap: () => _elegirHora(actuales),
-                        ),
+                      ButtonSegment(
+                        value: ModoTema.oscuro,
+                        icon: Icon(Icons.dark_mode),
+                        label: Text('Oscuro'),
+                      ),
                     ],
+                    selected: {modo},
+                    onSelectionChanged: (elegido) =>
+                        _cambiarModoTema(elegido.first),
                   ),
                 ),
                 const SizedBox(height: 24),

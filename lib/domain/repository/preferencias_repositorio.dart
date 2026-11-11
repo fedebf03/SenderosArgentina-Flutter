@@ -1,7 +1,7 @@
 import '../model/preferencias.dart';
 
 abstract class PreferenciasRepositorio {
-  Future<Preferencias> obtener();
+  Future<ModoTema> modoTema();
 
-  Future<void> guardar(Preferencias preferencias);
+  Future<void> guardarModoTema(ModoTema modo);
 }
