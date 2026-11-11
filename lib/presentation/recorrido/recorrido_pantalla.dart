@@ -36,18 +36,22 @@ class _RecorridoPantallaState extends State<RecorridoPantalla> {
   double? _rumbo;
   int _pasos = 0;
   bool _sinUbicacion = false;
+  final _inicio = DateTime.now();
+
+  // RF7 - Notificaciones: se arranca recién con la primera posición, porque Android no deja
+  // abrir el servicio de ubicación si todavía no se aceptó el permiso
+  void _actualizarNotificacion() => unawaited(
+    widget.notificaciones.mostrarRecorrido(
+      widget.sendero.nombre,
+      '${kilometros(_recorridos)} recorridos · $_pasos pasos',
+      _inicio,
+    ),
+  );
 
   // RF5 - Seguimiento: con cada posición nueva se suma lo caminado desde la anterior
   @override
   void initState() {
     super.initState();
-    // RF7 - Notificaciones: avisar que empezó el recorrido
-    unawaited(
-      widget.notificaciones.avisar(
-        'Recorrido iniciado',
-        'Arrancaste ${widget.sendero.nombre}. ¡Buen camino!',
-      ),
-    );
     _suscripciones.addAll([
       widget.ubicacion.seguirUbicacion().listen(
         (actual) => setState(() {
@@ -56,6 +60,7 @@ class _RecorridoPantallaState extends State<RecorridoPantalla> {
             _recorridos += kilometrosRecorridos([_posicion!, nueva]);
           }
           _posicion = nueva;
+          _actualizarNotificacion();
         }),
         onError: (_) => setState(() => _sinUbicacion = true),
       ),
@@ -76,13 +81,7 @@ class _RecorridoPantallaState extends State<RecorridoPantalla> {
     for (final suscripcion in _suscripciones) {
       suscripcion.cancel();
     }
-    // Avisar el fin al salir, ya sea con Finalizar o con la flecha de atrás
-    unawaited(
-      widget.notificaciones.avisar(
-        'Recorrido finalizado',
-        '${widget.sendero.nombre}: ${kilometros(_recorridos)} y $_pasos pasos',
-      ),
-    );
+    unawaited(widget.notificaciones.cerrarRecorrido());
     super.dispose();
   }
 
