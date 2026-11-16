@@ -1,23 +1,44 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/model/punto.dart';
 import '../../domain/model/sendero.dart';
+import '../../domain/repository/foto_repositorio.dart';
 import '../../domain/repository/sendero_repositorio.dart';
+import '../../domain/repository/notificacion_repositorio.dart';
+import '../../domain/repository/sensores_repositorio.dart';
+import '../../domain/repository/ubicacion_repositorio.dart';
+import '../editar_sendero/formulario_sendero_pantalla.dart';
 import 'datos_sendero.dart';
 import 'detalle_sendero_pantalla.dart';
 
 class ExplorarPantalla extends StatefulWidget {
   final SenderoRepositorio senderos;
+  final UbicacionRepositorio ubicacion;
+  final FotoRepositorio fotos;
+  final SensoresRepositorio sensores;
+  final NotificacionRepositorio notificaciones;
 
-  const ExplorarPantalla({super.key, required this.senderos});
+  const ExplorarPantalla({
+    super.key,
+    required this.senderos,
+    required this.ubicacion,
+    required this.fotos,
+    required this.sensores,
+    required this.notificaciones,
+  });
 
   @override
   State<ExplorarPantalla> createState() => _ExplorarPantallaState();
 }
 
 class _ExplorarPantallaState extends State<ExplorarPantalla> {
-  late final Future<List<Sendero>> _senderos = widget.senderos
-      .obtenerSenderos();
+  late final Stream<List<Sendero>> _publicos = widget.senderos
+      .senderosPublicos();
+  late final Stream<List<Sendero>> _mios = widget.senderos.misSenderos();
   final _buscador = TextEditingController();
+  final Set<Dificultad> _dificultades = {};
+  Punto? _miUbicacion;
+  bool _soloMios = false;
 
   @override
   void dispose() {
@@ -31,14 +52,57 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
     return senderos
         .where(
           (sendero) =>
-              sendero.nombre.toLowerCase().contains(texto) ||
-              sendero.region.toLowerCase().contains(texto),
+              (sendero.nombre.toLowerCase().contains(texto) ||
+                  sendero.region.toLowerCase().contains(texto)) &&
+              (_dificultades.isEmpty ||
+                  _dificultades.contains(sendero.dificultad)),
         )
         .toList();
   }
 
+  Future<void> _ordenarPorCercania(bool activado) async {
+    if (!activado) return setState(() => _miUbicacion = null);
+    try {
+      final actual = await widget.ubicacion.ubicacionActual();
+      setState(() => _miUbicacion = Punto(actual.latitud, actual.longitud));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No pudimos obtener tu ubicación')),
+      );
+    }
+  }
+
+  // Los senderos sin ubicación quedan al final
+  double _distanciaA(Sendero sendero) => sendero.latitud == null
+      ? double.infinity
+      : kilometrosRecorridos([
+          _miUbicacion!,
+          Punto(sendero.latitud!, sendero.longitud!),
+        ]);
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Nuevo sendero',
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => FormularioSenderoPantalla(
+              senderos: widget.senderos,
+              ubicacion: widget.ubicacion,
+              fotos: widget.fotos,
+            ),
+          ),
+        ),
+        child: const Icon(Icons.add),
+      ),
+      body: _contenido(),
+    );
+  }
+
+  Widget _contenido() {
     return Column(
       children: [
         Padding(
@@ -64,45 +128,111 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
             ),
           ),
         ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: Row(
+            spacing: 8,
+            children: [
+              FilterChip(
+                label: const Text('Mis senderos'),
+                selected: _soloMios,
+                onSelected: (activado) => setState(() => _soloMios = activado),
+              ),
+              FilterChip(
+                avatar: const Icon(Icons.near_me),
+                label: const Text('Más cercanos'),
+                selected: _miUbicacion != null,
+                onSelected: _ordenarPorCercania,
+              ),
+              for (final dificultad in Dificultad.values)
+                FilterChip(
+                  label: Text(IndicadorDificultad.textos[dificultad]!),
+                  selected: _dificultades.contains(dificultad),
+                  onSelected: (activado) => setState(
+                    () => activado
+                        ? _dificultades.add(dificultad)
+                        : _dificultades.remove(dificultad),
+                  ),
+                ),
+            ],
+          ),
+        ),
         Expanded(
-          child: FutureBuilder<List<Sendero>>(
-            future: _senderos,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const Center(
-                  child: Text('No pudimos cargar los senderos públicos'),
-                );
-              }
-              if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.data!.isEmpty) {
-                return const Center(
-                  child: Text('Todavía no hay senderos publicados'),
-                );
-              }
-              final senderos = _filtrar(snapshot.data!);
-              if (senderos.isEmpty) {
-                return const Center(child: Text('No se encontraron senderos'));
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: senderos.length,
-                itemBuilder: (context, indice) =>
-                    _TarjetaSendero(sendero: senderos[indice]),
-              );
-            },
+          child: StreamBuilder<List<Sendero>>(
+            stream: _publicos,
+            builder: (context, publicos) => StreamBuilder<List<Sendero>>(
+              stream: _mios,
+              builder: (context, mios) {
+                if (publicos.hasError) {
+                  return const Center(
+                    child: Text('No pudimos cargar los senderos'),
+                  );
+                }
+                if (!publicos.hasData || !mios.hasData && !mios.hasError) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return _lista(publicos.data!, mios.data ?? []);
+              },
+            ),
           ),
         ),
       ],
     );
   }
+
+  // RF2 - Explorar: primero los senderos públicos y al final los propios, que se pueden editar
+  Widget _lista(List<Sendero> publicos, List<Sendero> mios) {
+    if (publicos.isEmpty && mios.isEmpty) {
+      return const Center(child: Text('Todavía no hay senderos'));
+    }
+    final propios = mios.where((sendero) => sendero.idOrigen.isEmpty).toList();
+    final idsPropios = propios.map((sendero) => sendero.id).toSet();
+    final ajenos = publicos
+        .where((sendero) => !idsPropios.contains(sendero.id))
+        .toList();
+    final todos = [if (!_soloMios) ..._filtrar(ajenos), ..._filtrar(propios)];
+    if (todos.isEmpty) {
+      return const Center(child: Text('No se encontraron senderos'));
+    }
+    if (_miUbicacion != null) {
+      todos.sort((a, b) => _distanciaA(a).compareTo(_distanciaA(b)));
+    }
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
+      children: [
+        for (final sendero in todos)
+          TarjetaSendero(
+            sendero: sendero,
+            ubicacion: widget.ubicacion,
+            sensores: widget.sensores,
+            notificaciones: widget.notificaciones,
+            senderos: propios.contains(sendero) ? widget.senderos : null,
+            fotos: propios.contains(sendero) ? widget.fotos : null,
+          ),
+      ],
+    );
+  }
 }
 
-class _TarjetaSendero extends StatelessWidget {
+class TarjetaSendero extends StatelessWidget {
   final Sendero sendero;
+  final UbicacionRepositorio ubicacion;
+  final SensoresRepositorio sensores;
+  final NotificacionRepositorio notificaciones;
+  // Solo llegan en los senderos propios, para poder editar desde el detalle
+  final SenderoRepositorio? senderos;
+  final FotoRepositorio? fotos;
 
-  const _TarjetaSendero({required this.sendero});
+  const TarjetaSendero({
+    super.key,
+    required this.sendero,
+    required this.ubicacion,
+    required this.sensores,
+    required this.notificaciones,
+    this.senderos,
+    this.fotos,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +247,14 @@ class _TarjetaSendero extends StatelessWidget {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => DetalleSenderoPantalla(sendero: sendero),
+            builder: (_) => DetalleSenderoPantalla(
+              sendero: sendero,
+              ubicacion: ubicacion,
+              sensores: sensores,
+              notificaciones: notificaciones,
+              senderos: senderos,
+              fotos: fotos,
+            ),
           ),
         ),
         child: Row(

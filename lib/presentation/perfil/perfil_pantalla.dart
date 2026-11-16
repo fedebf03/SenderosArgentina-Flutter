@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/model/perfil.dart';
+import '../../domain/model/preferencias.dart';
 import '../../domain/repository/autenticacion_repositorio.dart';
 import '../../domain/repository/perfil_repositorio.dart';
+import '../../domain/repository/preferencias_repositorio.dart';
 import 'editar_perfil_pantalla.dart';
 
 class PerfilPantalla extends StatefulWidget {
   final AutenticacionRepositorio autenticacion;
   final PerfilRepositorio perfiles;
+  final PreferenciasRepositorio preferencias;
+  final ValueNotifier<ModoTema> modoTema;
 
   const PerfilPantalla({
     super.key,
     required this.autenticacion,
     required this.perfiles,
+    required this.preferencias,
+    required this.modoTema,
   });
 
   @override
@@ -35,6 +41,11 @@ class _PerfilPantallaState extends State<PerfilPantalla> {
         _perfil = widget.perfiles.obtener();
       });
     }
+  }
+
+  Future<void> _cambiarModoTema(ModoTema modo) async {
+    widget.modoTema.value = modo;
+    await widget.preferencias.guardarModoTema(modo);
   }
 
   Future<void> _cerrarSesion() async {
@@ -134,7 +145,35 @@ class _PerfilPantallaState extends State<PerfilPantalla> {
                   icon: const Icon(Icons.edit_outlined),
                   label: const Text('Editar perfil'),
                 ),
+                const SizedBox(height: 32),
+                Text('Preferencias', style: tema.textTheme.titleMedium),
                 const SizedBox(height: 12),
+                ValueListenableBuilder<ModoTema>(
+                  valueListenable: widget.modoTema,
+                  builder: (context, modo, _) => SegmentedButton<ModoTema>(
+                    segments: const [
+                      ButtonSegment(
+                        value: ModoTema.sistema,
+                        icon: Icon(Icons.brightness_auto),
+                        label: Text('Sistema'),
+                      ),
+                      ButtonSegment(
+                        value: ModoTema.claro,
+                        icon: Icon(Icons.light_mode),
+                        label: Text('Claro'),
+                      ),
+                      ButtonSegment(
+                        value: ModoTema.oscuro,
+                        icon: Icon(Icons.dark_mode),
+                        label: Text('Oscuro'),
+                      ),
+                    ],
+                    selected: {modo},
+                    onSelectionChanged: (elegido) =>
+                        _cambiarModoTema(elegido.first),
+                  ),
+                ),
+                const SizedBox(height: 24),
                 OutlinedButton.icon(
                   onPressed: _cerrarSesion,
                   style: OutlinedButton.styleFrom(
