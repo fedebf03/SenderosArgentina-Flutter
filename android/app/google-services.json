@@ -59,6 +59,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1003396831484-fb95sboi6utcfjn0a9lciholdovolkku.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.unaj.senderos.senderos_argentina",
+            "certificate_hash": "860af243fd97ae995d0c0ddb8cade31ee42640dc"
+          }
+        },
+        {
           "client_id": "1003396831484-1lnae8ls2hri4ou235ir844h6en4r0re.apps.googleusercontent.com",
           "client_type": 3
         }

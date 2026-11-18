@@ -12,13 +12,14 @@ import 'data/repository/ubicacion_repositorio_geolocator.dart';
 import 'domain/model/preferencias.dart';
 import 'domain/model/usuario.dart';
 import 'domain/repository/preferencias_repositorio.dart';
+import 'firebase_options.dart';
 import 'presentation/auth/login_pantalla.dart';
 import 'presentation/inicio/inicio_pantalla.dart';
 import 'presentation/tema.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // El tema guardado se lee antes de dibujar para que no aparezca uno y cambie enseguida
   final preferencias = PreferenciasRepositorioLocal();
   final modoTema = await preferencias.modoTema();
