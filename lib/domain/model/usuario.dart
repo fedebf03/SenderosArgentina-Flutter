@@ -5,3 +5,6 @@ class Usuario {
 
   Usuario({required this.correo, this.nombre = '', this.fotoUrl = ''});
 }
+
+bool correoValido(String correo) =>
+    correo.contains('@') && correo.contains('.');

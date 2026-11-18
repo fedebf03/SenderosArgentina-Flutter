@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/model/usuario.dart';
 import '../../domain/repository/autenticacion_repositorio.dart';
 import 'registro_pantalla.dart';
 
@@ -34,7 +35,7 @@ class _LoginPantallaState extends State<LoginPantalla> {
       setState(() => _error = 'Completá el correo y la contraseña');
       return;
     }
-    if (!correo.contains('@') || !correo.contains('.')) {
+    if (!correoValido(correo)) {
       setState(() => _error = 'El correo no tiene un formato válido');
       return;
     }
@@ -94,7 +95,7 @@ class _LoginPantallaState extends State<LoginPantalla> {
     if (enviar != true || !mounted) return;
 
     var mensaje = 'Revisá tu correo para elegir una contraseña nueva';
-    if (!correo.contains('@') || !correo.contains('.')) {
+    if (!correoValido(correo)) {
       mensaje = 'El correo no tiene un formato válido';
     } else {
       try {

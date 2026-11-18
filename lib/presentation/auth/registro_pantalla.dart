@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/model/usuario.dart';
 import '../../domain/repository/autenticacion_repositorio.dart';
 
 class RegistroPantalla extends StatefulWidget {
@@ -31,7 +32,7 @@ class _RegistroPantallaState extends State<RegistroPantalla> {
   Future<void> _registrarse() async {
     final correo = _correoController.text.trim();
     final clave = _claveController.text;
-    if (!correo.contains('@') || !correo.contains('.')) {
+    if (!correoValido(correo)) {
       setState(() => _error = 'El correo no tiene un formato válido');
       return;
     }

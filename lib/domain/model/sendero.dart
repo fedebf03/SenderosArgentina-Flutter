@@ -39,3 +39,37 @@ class Sendero {
     this.idOrigen = '',
   });
 }
+
+// RF2 - Explorar: la búsqueda filtra por nombre o región sin distinguir mayúsculas
+List<Sendero> filtrarSenderos(
+  List<Sendero> senderos,
+  String busqueda,
+  Set<Dificultad> dificultades,
+) {
+  final texto = busqueda.trim().toLowerCase();
+  return senderos
+      .where(
+        (sendero) =>
+            (sendero.nombre.toLowerCase().contains(texto) ||
+                sendero.region.toLowerCase().contains(texto)) &&
+            (dificultades.isEmpty || dificultades.contains(sendero.dificultad)),
+      )
+      .toList();
+}
+
+// Un sendero propio que se publicó aparece también en los públicos, así que se saca de ahí
+List<Sendero> senderosAjenos(List<Sendero> publicos, List<Sendero> propios) {
+  final idsPropios = propios.map((sendero) => sendero.id).toSet();
+  return publicos.where((sendero) => !idsPropios.contains(sendero.id)).toList();
+}
+
+// Los senderos sin ubicación quedan al final
+void ordenarPorCercania(List<Sendero> senderos, Punto ubicacion) {
+  double distancia(Sendero sendero) => sendero.latitud == null
+      ? double.infinity
+      : kilometrosRecorridos([
+          ubicacion,
+          Punto(sendero.latitud!, sendero.longitud!),
+        ]);
+  senderos.sort((a, b) => distancia(a).compareTo(distancia(b)));
+}

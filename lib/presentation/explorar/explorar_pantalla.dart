@@ -46,19 +46,8 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
     super.dispose();
   }
 
-  // RF2 - Explorar: la búsqueda filtra por nombre o región sin distinguir mayúsculas
-  List<Sendero> _filtrar(List<Sendero> senderos) {
-    final texto = _buscador.text.trim().toLowerCase();
-    return senderos
-        .where(
-          (sendero) =>
-              (sendero.nombre.toLowerCase().contains(texto) ||
-                  sendero.region.toLowerCase().contains(texto)) &&
-              (_dificultades.isEmpty ||
-                  _dificultades.contains(sendero.dificultad)),
-        )
-        .toList();
-  }
+  List<Sendero> _filtrar(List<Sendero> senderos) =>
+      filtrarSenderos(senderos, _buscador.text, _dificultades);
 
   Future<void> _ordenarPorCercania(bool activado) async {
     if (!activado) return setState(() => _miUbicacion = null);
@@ -72,14 +61,6 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
       );
     }
   }
-
-  // Los senderos sin ubicación quedan al final
-  double _distanciaA(Sendero sendero) => sendero.latitud == null
-      ? double.infinity
-      : kilometrosRecorridos([
-          _miUbicacion!,
-          Punto(sendero.latitud!, sendero.longitud!),
-        ]);
 
   @override
   Widget build(BuildContext context) {
@@ -187,16 +168,13 @@ class _ExplorarPantallaState extends State<ExplorarPantalla> {
       return const Center(child: Text('Todavía no hay senderos'));
     }
     final propios = mios.where((sendero) => sendero.idOrigen.isEmpty).toList();
-    final idsPropios = propios.map((sendero) => sendero.id).toSet();
-    final ajenos = publicos
-        .where((sendero) => !idsPropios.contains(sendero.id))
-        .toList();
+    final ajenos = senderosAjenos(publicos, propios);
     final todos = [if (!_soloMios) ..._filtrar(ajenos), ..._filtrar(propios)];
     if (todos.isEmpty) {
       return const Center(child: Text('No se encontraron senderos'));
     }
     if (_miUbicacion != null) {
-      todos.sort((a, b) => _distanciaA(a).compareTo(_distanciaA(b)));
+      ordenarPorCercania(todos, _miUbicacion!);
     }
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
